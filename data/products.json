@@ -1,0 +1,30 @@
+[
+  {
+    "id": "parisiens-cruise",
+    "title": "Parisiens Seine River Cruise",
+    "description": "<p>Open-date 1-hour cruise with audio guide.</p>",
+    "images": ["/images/parisiens-1.jpg"],
+    "variants": [
+      { "label": "Adult", "priceCents": 1499, "sku": "PARISIENS-ADULT" },
+      { "label": "Child", "priceCents": 799, "sku": "PARISIENS-CHILD" }
+    ]
+  },
+  {
+    "id": "bateaux-mouches",
+    "title": "Bateaux Mouches Seine Cruise",
+    "images": ["/images/mouches-1.jpg"],
+    "variants": [
+      { "label": "Adult", "priceCents": 1499, "sku": "MOUCHES-ADULT" },
+      { "label": "Child", "priceCents": 799, "sku": "MOUCHES-CHILD" }
+    ]
+  },
+  {
+    "id": "bigbus-cruise-combo",
+    "title": "Big Bus + Seine Cruise Combo",
+    "images": ["/images/bigbus-1.jpg"],
+    "variants": [
+      { "label": "Adult", "priceCents": 4499, "sku": "BIGBUS-CRUISE-ADULT" },
+      { "label": "Child", "priceCents": 2900, "sku": "BIGBUS-CRUISE-CHILD" }
+    ]
+  }
+]
