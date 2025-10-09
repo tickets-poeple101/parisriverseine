@@ -1,6 +1,6 @@
 // app/api/checkout/route.ts
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import rawCatalog from "@/data/products.json" assert { type: "json" };
 
 type Variant = {
@@ -97,6 +97,7 @@ export async function POST(req: Request) {
   const success_url = successUrl ?? `${baseUrl}/success`;
   const cancel_url = cancelUrl ?? `${baseUrl}/cancel`;
 
+  const stripe = getStripe();
   const session = await stripe.checkout.sessions.create(
     {
       mode: "payment",

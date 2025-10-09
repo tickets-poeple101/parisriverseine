@@ -2,10 +2,12 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+const stripe = getStripe();
 
 export async function POST(req: Request) {
   const hdrs = await headers(); // <-- await to satisfy your TS defs
