@@ -1,135 +1,55 @@
-"use client";
+// app/products/[slug]/page.tsx
+import { Metadata } from "next";
+import TicketSelector from "@/components/TicketSelector";
+import rawCatalog from "@/data/products.json" assert { type: "json" };
 
-import TicketSelector, { SelectorProduct } from "@/components/TicketSelector";
-import { ReviewsMarquee, Review } from "@/components/ReviewsMarquee";
-import { CredibilityGallery, CredItem } from "@/components/CredibilityGallery";
-import data from "@/data/products.json";
+type Variant = {
+  label: string;
+  priceCents: number;
+  sku: string;
+};
 
-const products = data as unknown as SelectorProduct[];
+type CatalogItem = {
+  id: string;
+  title: string;
+  images: string[];
+  variants: Variant[];
+  description?: string;
+};
 
-const reviews: Review[] = [
-  { name: "Sophie Laurent", location: "London, UK", text: "Sunset cruise was magical. Eiffel Tower lighting from the river = wow.", rating: 5, date: "2 weeks ago", bookingDate: "Mar 2024", imageUrl: "/images/avatar1.jpg" },
-  { name: "James Mitchell", location: "NY, USA", text: "Anniversary dinner cruise. Great food, amazing views, smooth booking.", rating: 5, date: "1 month ago" },
-  { name: "Maria Rodriguez", location: "Barcelona", text: "Commentary was actually useful. Learned a lot. Easy mobile tickets.", rating: 5, date: "3 weeks ago" },
-  { name: "David Chen", location: "Toronto", text: "Comfortable boat, spectacular views. Great value.", rating: 5, date: "3 weeks ago" }
-];
+const CATALOG = rawCatalog as CatalogItem[];
 
-const partners: CredItem[] = [
-  { src: "/images/partner-ta.png", caption: "Tripadvisor Travelers’ Choice", show: true },
-  { src: "/images/partner-stripe.svg", caption: "Stripe Secure Payments", show: true },
-  { src: "/images/partner-visa.svg", caption: "Visa", show: true },
-  { src: "/images/partner-mastercard.svg", caption: "Mastercard", show: true },
-  { src: "/images/partner-amex.svg", caption: "American Express", show: false },
-  { src: "/images/partner-bus.png", caption: "Big Bus Official Partner", show: true }
-];
+type PageProps = {
+  params: { slug: string };
+};
 
-export default function ProductPage() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const product = CATALOG.find((p) => p.id === params.slug);
+  return {
+    title: product
+      ? `${product.title} | Paris River Seine`
+      : "Product | Paris River Seine",
+  };
+}
+
+export default function ProductPage({ params }: PageProps) {
+  const product = CATALOG.find((p) => p.id === params.slug);
+
+  if (!product) {
+    return <main className="p-8">Product not found.</main>;
+  }
+
+  const variants = product.variants.map((v) => v.label);
+
   return (
-    <>
-      {/* On-screen checkout */}
+    <main className="max-w-5xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
       <TicketSelector
-        products={products}
-        selectorTitle="Choose Your Experience"
-        selectorSubtitle="Select ticket type and quantity"
-        ticketsLeftCopy="12 left at this price"
-        ticketsSoldToday={340}
-        tripadvisor={{
-          rating: 4.8,
-          reviews: "13,434",
-          year: "2024",
-          thumbUrl: "/images/paris-thumb.jpg",
-          badgeUrl: "/images/ta-badge.png",
-        }}
-       onCheckout={async ({ date, items, totalCents }) => {
-  // 1) See exactly what TicketSelector is sending
-  console.log("RAW items from TicketSelector ⬇️");
-  console.table(items);
+  slug={params.slug}
+  variants={variants}
+  products={[product]}
+/>
 
-  // Helpers
-  const toCents = (val: unknown) => {
-    if (typeof val === "number" && Number.isFinite(val)) return Math.round(val);
-    if (typeof val === "string") {
-      const n = Number(val.replace(/[^0-9.]/g, ""));
-      if (!Number.isFinite(n)) return NaN;
-      // if it looks like "17.99", convert to 1799
-      return val.includes(".") ? Math.round(n * 100) : Math.round(n);
-    }
-    return NaN;
-    };
-  const toQty = (val: unknown) => {
-    const n = Number(val ?? 0);
-    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
-  };
-
-  // 2) Map **permissively** across common field names
-  const payload = {
-    date,
-    items: (items as any[]).map((i) => {
-      const title = String(i.title ?? i.name ?? "Ticket");
-      const variantTitle = String(i.vtitle ?? i.variantTitle ?? i.variant ?? i.option ?? "");
-      const unitAmountCents = toCents(
-        i.price ?? i.unitAmountCents ?? i.amount ?? i.unit_amount ?? i.unitPriceCents
-      );
-      const quantity = toQty(i.qty ?? i.quantity ?? i.qtySelected ?? i.count ?? i.units ?? 0);
-      return { title, variantTitle, unitAmountCents, quantity };
-    })
-    .filter((i) => i.quantity > 0 && Number.isFinite(i.unitAmountCents) && i.unitAmountCents > 0),
-  };
-
-  // Debug: show what we’re sending
-  console.log("➡️ Payload to /api/checkout", payload);
-
-  if (!payload.items.length) {
-    const rawCount = (items as any[]).reduce(
-      (n, i) => n + (Number(i.qty ?? i.quantity ?? i.count ?? i.units ?? 0) || 0),
-      0
-    );
-    alert(
-      `No valid line items. Raw count seen: ${rawCount}. 
-Make sure you actually clicked + on a ticket, then try again.`
-    );
-    return;
-  }
-
-  const res = await fetch("/api/checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    console.error("Checkout init failed", await res.text());
-    alert("Checkout init failed. Check console for details.");
-    return;
-  }
-
-  const data = await res.json();
-  if (data?.url) window.location.href = data.url;
-  else alert("No checkout URL returned.");
-}}
-
-
-
-      />
-
-      {/* Reviews marquee */}
-      <div className="mt-12">
-        <ReviewsMarquee reviews={reviews} speedSec={35} bgClass="bg-slate-50" />
-      </div>
-
-      {/* Credibility block */}
-      <div className="mt-12">
-        <CredibilityGallery
-          title="Trusted. Secure. Official."
-          subtitle="Official partners and bank-level security. We protect your data and payments end-to-end."
-          items={partners}
-          showIndicators
-          showSecurity
-          minWidth={200}
-          aspect={1.5}
-          grayscale={80}
-        />
-      </div>
-    </>
+    </main>
   );
 }

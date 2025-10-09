@@ -1,20 +1,8 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
+import Image from 'next/image';
 
-/**
- * TicketSelector — React/Tailwind port of your Shopify custom block
- *
- * What you get in one file:
- * - TripAdvisor badge card (rating, reviews, optional image/badge)
- * - Left info/slider pane that updates per selected product
- * - Right selector with three product cards, inline qty per variant (Adult/Child)
- * - Date picker (required before enabling CTA)
- * - Mini-cart preview + sticky mobile summary bar
- * - Accessible focus states, responsive layout, basic animations
- *
- * NOTE: This is UI-only. Wire the CTA to Stripe later.
- */
 
 /** Types */
 export type Variant = {
@@ -40,6 +28,8 @@ export type TripAdvisorProps = {
 };
 
 export type TicketSelectorProps = {
+  slug: string;
+  variants: string[];
   products: SelectorProduct[]; // up to 3
   selectorTitle?: string;
   selectorSubtitle?: string;
@@ -379,10 +369,17 @@ function EmptyInfoPane({
         <div className="relative grid grid-cols-[auto_1fr_auto] items-center gap-4 overflow-hidden rounded-2xl bg-emerald-400 p-4 text-emerald-950 shadow-sm">
           <div className="absolute -left-16 top-0 bottom-0 w-44 -skew-x-12 bg-emerald-500" />
           {tripadvisor.thumbUrl && (
-            <div className="relative z-[1] h-20 w-20 overflow-hidden rounded-2xl shadow-md">
-              <img src={tripadvisor.thumbUrl} alt="Cruise thumb" className="h-full w-full object-cover" />
-            </div>
-          )}
+  <div className="relative z-[1] h-20 w-20 overflow-hidden rounded-2xl shadow-md">
+    <Image
+      src={tripadvisor.thumbUrl}
+      alt="Cruise thumb"
+      fill
+      sizes="80px"
+      className="object-cover"
+    />
+  </div>
+)}
+
           <div className="relative z-[1]">
             <div className="text-4xl font-black leading-none">{tripadvisor.rating}<small className="ml-1 align-top text-base font-black">/5</small></div>
             <div className="mt-1 text-lg" aria-hidden="true">★ ★ ★ ★ ★</div>
@@ -390,10 +387,17 @@ function EmptyInfoPane({
           </div>
           <div className="relative z-[1] w-40 text-center opacity-95">
             {tripadvisor.badgeUrl ? (
-              <img src={tripadvisor.badgeUrl} className="mx-auto w-full" alt={`Tripadvisor Travelers' Choice ${tripadvisor.year}`} />
-            ) : (
-              <div className="text-sm font-black">TRAVELERS’ CHOICE {tripadvisor.year}</div>
-            )}
+  <Image
+    src={tripadvisor.badgeUrl}
+    alt={`Tripadvisor Travelers' Choice ${tripadvisor.year}`}
+    width={160}
+    height={48}
+    className="mx-auto h-auto w-full"
+  />
+) : (
+  <div className="text-sm font-black">TRAVELERS’ CHOICE {tripadvisor.year}</div>
+)}
+
           </div>
         </div>
       )}
@@ -433,11 +437,20 @@ function InfoPane({ p }: { p: SelectorProduct }) {
       {/* Simple slider */}
       <div className="relative overflow-hidden rounded-xl border border-[var(--line)] bg-black shadow-sm">
         {img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={img} alt={p.title} className="h-[280px] w-full object-cover" />
-        ) : (
-          <div className="h-[280px] w-full bg-slate-300" />
-        )}
+  <div className="relative h-[280px] w-full">
+    <Image
+      src={img}
+      alt={p.title}
+      fill
+      sizes="(max-width: 768px) 100vw, 560px"
+      className="object-cover"
+      priority={false}
+    />
+  </div>
+) : (
+  <div className="h-[280px] w-full bg-slate-300" />
+)}
+
         {p.images.length > 1 && (
           <div className="absolute inset-0 flex items-center justify-between p-2">
             <button
