@@ -2,51 +2,46 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 
-const nav = [
-  { href: "/", label: "Home" },
-  { href: "/products/test", label: "Tickets" },
-  { href: "/#about", label: "About" },
-  { href: "/#contact", label: "Contact" },
-];
+/** Tweak these */
+const SUPPORT_EMAIL = "tickets@parisriverseinecruises.com";
+const TICKETS_HREF = "/#tickets";
+const LOGO_SIZE = 40; // 👈 make the logo bigger/smaller by changing this (36–48 is nice)
 
 export default function Header() {
-  const pathname = usePathname();
-
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          {/* Replace with your logo file */}
-          <Image src="/images/logo.svg" alt="Paris River Seine" width={28} height={28} />
-          <span className="text-sm font-black tracking-tight">PARIS RIVER SEINE</span>
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-3" aria-label="Paris River Seine – Home">
+          <Image
+            src="/logo.svg"
+            alt=""
+            width={LOGO_SIZE}
+            height={LOGO_SIZE}
+            className="shrink-0"
+            onError={(e) => {
+              // @ts-ignore hide broken image so fallback badge isn't visible
+              e.currentTarget.style.display = "none";
+            }}
+            priority
+          />
+          <span className="text-base md:text-lg font-extrabold tracking-tight leading-none">
+            Paris River Seine
+          </span>
         </Link>
 
-        {/* Nav */}
-        <nav className="hidden gap-6 md:flex">
-          {nav.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`text-sm font-medium hover:text-slate-900 ${
-                  active ? "text-slate-900" : "text-slate-600"
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Right side (CTA) */}
+        {/* Actions */}
         <div className="flex items-center gap-2">
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            Contact
+          </a>
           <Link
-            href="/products/test"
-            className="rounded-lg border border-slate-200 bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:brightness-110"
+            href={TICKETS_HREF}
+            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:brightness-110"
           >
             Book tickets
           </Link>
