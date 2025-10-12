@@ -1,0 +1,60 @@
+.
+├── .env.local
+├── .gitignore
+├── .nvmrc
+├── app
+│   ├── api
+│   │   ├── checkout
+│   │   │   └── route.ts
+│   │   └── stripe
+│   │       └── webhook
+│   │           └── route.ts
+│   ├── cancel
+│   │   └── page.tsx
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── policies
+│   │   ├── privacy
+│   │   │   └── page.tsx
+│   │   ├── refund
+│   │   │   └── page.tsx
+│   │   └── terms
+│   │       └── page.tsx
+│   ├── products
+│   │   └── [slug]
+│   │       └── page.tsx
+│   └── success
+│       └── page.tsx
+├── components
+│   ├── CredibilityGallery.tsx
+│   ├── Footer.tsx
+│   ├── Header.tsx
+│   ├── ReviewsMarquee.tsx
+│   └── TicketSelector.tsx
+├── data
+│   └── products.json
+├── env.d.ts
+├── eslint.config.mjs
+├── lib
+│   └── stripe.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── project-structure.txt
+├── public
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── images
+│   │   └── ta-watermark.svg
+│   ├── logo.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── tsconfig.json
+└── tsconfig.tsbuildinfo
+
+19 directories, 39 files

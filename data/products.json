@@ -2,29 +2,84 @@
   {
     "id": "parisiens-cruise",
     "title": "Parisiens Seine River Cruise",
-    "description": "<p>Open-date 1-hour cruise with audio guide.</p>",
+    "description": "<p>Relax on a classic 1-hour Seine cruise from the Eiffel Tower. Glide past the Louvre, Musée d’Orsay, Notre-Dame and historic bridges while listening on your phone with the included audio-guide app (onboard Wi-Fi helps you download it quickly).</p>",
     "images": ["/images/parisiens-1.jpg"],
     "variants": [
-      { "label": "Adult", "priceCents": 1499, "sku": "PARISIENS-ADULT" },
-      { "label": "Child", "priceCents": 799, "sku": "PARISIENS-CHILD" }
+      { "label": "Adult", "priceCents": 1499, "compareAtCents": 2167, "sku": "PARISIENS-ADULT" },
+      { "label": "Child", "priceCents": 799, "compareAtCents": 1209, "sku": "PARISIENS-CHILD" }
+    ],
+    "features": [
+      "Board near the Eiffel Tower (Port de la Bourdonnais, Pontoon #3)",
+      "Audio guide app in ~14 languages; paper route map on board",
+      "Indoor heated lounge + open-air deck; restrooms on board",
+      "Frequent departures all day; evening sailings available"
+    ],
+    "durationMinutes": 60,
+    "startPoint": "Port de la Bourdonnais (Eiffel Tower), Pontoon #3",
+    "audioLanguages": ["English","French","Spanish","German","Italian","Portuguese","Dutch","Polish","Russian","Chinese","Japanese","Korean","Arabic","Hindi"],
+    "seasonalDepartures": "Roughly every 30–45 min, from late morning into the evening (times vary by season).",
+    "startPointLatLng": { "lat": 48.861, "lng": 2.297 },
+    "itineraryStops": [
+      { "title": "Boarding at Pontoon #3", "time": "10:00", "note": "Show e-ticket at the gate" },
+      { "title": "Pass the Musée d'Orsay", "time": "10:20", "note": "Audio guide highlights" },
+      { "title": "Notre-Dame views", "time": "10:35", "note": "Great photo moment" },
+      { "title": "Return to Pontoon #3", "time": "11:00", "note": "Disembark" }
     ]
   },
   {
     "id": "bateaux-mouches",
     "title": "Bateaux Mouches Seine Cruise",
+    "description": "<p>See Paris from the river on a famous Bateaux Mouches boat. Spacious open decks and a glass-covered lounge offer great views year-round. Commentary is available and a multilingual route map helps you follow along.</p>",
     "images": ["/images/mouches-1.jpg"],
     "variants": [
-      { "label": "Adult", "priceCents": 1499, "sku": "MOUCHES-ADULT" },
-      { "label": "Child", "priceCents": 799, "sku": "MOUCHES-CHILD" }
+      { "label": "Adult", "priceCents": 1499, "compareAtCents": 2132, "sku": "MOUCHES-ADULT" },
+      { "label": "Child", "priceCents": 799,  "compareAtCents": 1212, "sku": "MOUCHES-CHILD" }
+    ],
+    "features": [
+      "Departs near Pont de l’Alma (Port de la Conférence, 75008)",
+      "Approx. 1h10 sightseeing loop on the Seine",
+      "Commentary available in English or French + route map in many languages",
+      "Frequent daytime and evening departures (more often in summer)"
+    ],
+    "durationMinutes": 70,
+    "startPoint": "Port de la Conférence (near Pont de l’Alma), 75008 Paris",
+    "audioLanguages": ["English","French"],
+    "seasonalDepartures": "About every 30 min (Apr–Sep) and ~every 45 min (Oct–Mar), typically 10:00–22:30.",
+    "startPointLatLng": { "lat": 48.8637, "lng": 2.3005 },
+    "itineraryStops": [
+      { "title": "Boarding at Port de la Conférence", "time": "10:00", "note": "Scan ticket at the pontoon" },
+      { "title": "Pont Alexandre III", "time": "10:15", "note": "Iconic bridge views" },
+      { "title": "Musée d’Orsay stretch", "time": "10:30", "note": "Glass lounge vantage points" },
+      { "title": "Turn near Île de la Cité", "time": "10:45", "note": "Notre-Dame panorama" },
+      { "title": "Return to Port de la Conférence", "time": "11:10", "note": "Disembark" }
     ]
   },
   {
     "id": "bigbus-cruise-combo",
     "title": "Big Bus + Seine Cruise Combo",
+    "description": "<p>Combine a 24- or 48-hour hop-on hop-off bus pass with a 1-hour Seine cruise. Cover Paris’ top sights by open-top bus (audio guide + Wi-Fi), then board your river cruise at the Eiffel Tower.</p>",
     "images": ["/images/bigbus-1.jpg"],
     "variants": [
-      { "label": "Adult", "priceCents": 4499, "sku": "BIGBUS-CRUISE-ADULT" },
-      { "label": "Child", "priceCents": 2900, "sku": "BIGBUS-CRUISE-CHILD" }
+      { "label": "Adult", "priceCents": 4499, "compareAtCents": 6043, "sku": "BIGBUS-CRUISE-ADULT" },
+      { "label": "Child", "priceCents": 2900, "compareAtCents": 4512, "sku": "BIGBUS-CRUISE-CHILD" }
+    ],
+    "features": [
+      "HOHO bus: 24h or 48h ticket with multilingual audio",
+      "Cruise: 1-hour sightseeing boat from the Eiffel Tower",
+      "Bus app with live tracking; Wi-Fi & headphones included",
+      "Cruise partner: Bateaux Parisiens (Eiffel Tower pontoon)"
+    ],
+    "durationMinutes": 60,
+    "startPoint": "Cruise at Port de la Bourdonnais (Eiffel Tower), Pontoon #3; bus from any Big Bus stop",
+    "audioLanguages": ["Multilingual audio on bus; cruise audio via partner"],
+    "seasonalDepartures": "Cruise roughly every 45 min; bus every ~10–20 min.",
+    "startPointLatLng": { "lat": 48.861, "lng": 2.297 },
+    "itineraryStops": [
+      { "title": "Start: Any Big Bus stop", "time": "09:30", "note": "Scan pass and ride to Eiffel Tower" },
+      { "title": "Arrive: Eiffel Tower stop", "time": "10:15", "note": "Walk to Port de la Bourdonnais" },
+      { "title": "Cruise boarding at Pontoon #3", "time": "10:30", "note": "Show cruise ticket" },
+      { "title": "Louvre riverfront", "time": "10:50", "note": "Open-top deck views" },
+      { "title": "Return to Pontoon #3", "time": "11:30", "note": "Continue bus route if desired" }
     ]
   }
 ]

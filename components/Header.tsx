@@ -6,7 +6,7 @@ import Image from "next/image";
 /** Tweak these */
 const SUPPORT_EMAIL = "tickets@parisriverseinecruises.com";
 const TICKETS_HREF = "/#tickets";
-const LOGO_SIZE = 40; // 👈 make the logo bigger/smaller by changing this (36–48 is nice)
+const LOGO_SIZE = 48; // 👈 make the logo bigger/smaller by changing this (36–48 is nice)
 
 export default function Header() {
   return (
@@ -15,17 +15,17 @@ export default function Header() {
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3" aria-label="Paris River Seine – Home">
           <Image
-            src="/logo.svg"
-            alt=""
-            width={LOGO_SIZE}
-            height={LOGO_SIZE}
-            className="shrink-0"
-            onError={(e) => {
-              // @ts-ignore hide broken image so fallback badge isn't visible
-              e.currentTarget.style.display = "none";
-            }}
-            priority
-          />
+  src="/logo.svg"
+  alt="Logo"
+  width={48}             // adjust size here (e.g. 40–48)
+  height={48}
+  className="shrink-0"
+  onError={(e) => {
+    (e.currentTarget as HTMLImageElement).style.display = "none";
+  }}
+  priority
+/>
+
           <span className="text-base md:text-lg font-extrabold tracking-tight leading-none">
             Paris River Seine
           </span>

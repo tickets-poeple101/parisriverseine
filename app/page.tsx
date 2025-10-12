@@ -6,19 +6,17 @@ import TicketSelector, {
   SelectorProduct,
   TripAdvisorProps,
 } from "@/components/TicketSelector";
-import rawCatalog from "@/data/products.json" assert { type: "json" };
+import rawCatalog from "@/data/products.json";
 
-type Variant = { label: string; priceCents: number; sku: string };
-type CatalogItem = { id: string; title: string; images: string[]; variants: Variant[]; description?: string };
 
-const CATALOG = rawCatalog as CatalogItem[];
+
+const CATALOG = rawCatalog as SelectorProduct[];
 
 // TripAdvisor & facts content (mirrors your Liquid copy)
 const tripadvisor: TripAdvisorProps = {
   rating: 4.8,
   reviews: "13,434",
   year: "2024",
-  // Optionally drop a local image in /public/images/ta-thumb.jpg and uncomment:
   // thumbUrl: "/images/ta-thumb.jpg",
   // badgeUrl: "/images/ta-badge.png",
 };
@@ -52,14 +50,8 @@ const facts = [
 ];
 
 export default function Home() {
-  // Use up to 3 products on the homepage
-  const products: SelectorProduct[] = CATALOG.slice(0, 3).map((p) => ({
-    id: p.id,
-    title: p.title,
-    description: p.description,
-    images: p.images,
-    variants: p.variants,
-  }));
+  // Use up to 3 products on the homepage (keep all fields incl. itinerary/map)
+  const products: SelectorProduct[] = CATALOG.slice(0, 3);
 
   // Called by TicketSelector when user presses “Book now”
   async function handleCheckout(payload: {
@@ -67,9 +59,8 @@ export default function Home() {
     items: Array<{ sku: string; qty: number; unitPriceCents: number; title: string; vtitle: string }>;
     totalCents: number;
   }) {
-    // Transform for API
     const body = {
-      items: payload.items.map((i) => ({ sku: i.sku, quantity: i.qty })), // multi-product cart supported
+      items: payload.items.map((i) => ({ sku: i.sku, quantity: i.qty })),
       successUrl: `${location.origin}/success`,
       cancelUrl: `${location.origin}/cancel`,
     };

@@ -2,17 +2,18 @@
   "name": "parisriverseine",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": "20.x" },
-
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit"
-  
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.7",
     "next": "15.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
