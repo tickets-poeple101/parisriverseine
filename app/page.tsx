@@ -1,4 +1,4 @@
-// app/page.tsx
+
 "use client";
 
 import React from "react";
@@ -7,6 +7,7 @@ import TicketSelector, {
   TripAdvisorProps,
 } from "@/components/TicketSelector";
 import rawCatalog from "@/data/products.json";
+import ReviewsSection from "@/components/ReviewsSection";
 
 
 
@@ -96,6 +97,11 @@ export default function Home() {
           onCheckout={handleCheckout}
         />
       </section>
+      {/* Reviews */}
+      <section className="max-w-[1140px] mx-auto px-4">
+        <ReviewsSection />
+      </section>
+
     </main>
   );
 }

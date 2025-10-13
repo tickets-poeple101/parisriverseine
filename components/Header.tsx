@@ -15,16 +15,16 @@ export default function Header() {
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3" aria-label="Paris River Seine – Home">
           <Image
-  src="/logo.svg"
-  alt="Logo"
-  width={48}             // adjust size here (e.g. 40–48)
-  height={48}
-  className="shrink-0"
-  onError={(e) => {
-    (e.currentTarget as HTMLImageElement).style.display = "none";
-  }}
-  priority
-/>
+            src="/logo.svg"
+            alt="Logo"
+            width={48}             // adjust size here (e.g. 40–48)
+            height={48}
+            className="shrink-0"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+            priority
+          />
 
           <span className="text-base md:text-lg font-extrabold tracking-tight leading-none">
             Paris River Seine
@@ -33,6 +33,30 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Policies (matches secondary button style, with lightweight dropdown) */}
+          <details className="relative">
+            <summary
+              className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
+              aria-haspopup="menu"
+            >
+              Policies
+            </summary>
+            <div
+              className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-lg"
+              role="menu"
+              aria-label="Policies"
+            >
+              <Link href="/policies/refund" className="block rounded px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50" role="menuitem">
+                Refund Policy
+              </Link>
+              <Link href="/policies/privacy" className="block rounded px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50" role="menuitem">
+                Privacy Policy
+              </Link>
+              <Link href="/policies/terms" className="block rounded px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50" role="menuitem">
+                Terms &amp; Conditions
+              </Link>
+            </div>
+          </details>
           <a
             href={`mailto:${SUPPORT_EMAIL}`}
             className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
@@ -46,6 +70,8 @@ export default function Header() {
             Book tickets
           </Link>
         </div>
+
+
       </div>
     </header>
   );
