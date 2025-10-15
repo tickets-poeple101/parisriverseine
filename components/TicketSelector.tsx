@@ -989,11 +989,12 @@ function savedPercent(nowCents: number, compareAtCents?: number) {
   return Math.round(((compareAtCents - nowCents) / compareAtCents) * 100);
 }
 
-function normLocal(src?: string) {
-  if (!src) return src as any;
+function normLocal(src?: string): string | undefined {
+  if (!src) return undefined;
   if (src.startsWith("http")) return src;           // allow remote URLs
   return src.startsWith("/") ? src : `/${src}`;     // force leading slash for /public
 }
+
 
 function buildOsmEmbed(lat: number, lng: number, zoom = 19) {
   const d = 0.0012; // tighter bbox (~130–150m)

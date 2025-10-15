@@ -1,68 +1,87 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+// app/api/stripe/webhook/route.ts
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 
-export const runtime = 'nodejs'; // required for Stripe SDK
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+const stripe = getStripe();
 
-export async function POST(req: NextRequest) {
-  const sig = req.headers.get('stripe-signature');
-  const raw = Buffer.from(await req.arrayBuffer());
+export async function POST(req: Request) {
+  const hdrs = await headers(); // <-- await to satisfy your TS defs
+  const sig = hdrs.get("stripe-signature");
+  const whsec = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!sig || !whsec) {
+    return NextResponse.json({ error: "Missing signature/secret" }, { status: 400 });
+  }
+
+  const rawBody = await req.text();
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      raw,
-      sig!,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
-    console.error('Stripe signature verify failed:', err.message);
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+    event = stripe.webhooks.constructEvent(rawBody, sig, whsec);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown signature error";
+    return new NextResponse(`Webhook Error: ${message}`, { status: 400 });
   }
 
-  // Handle only what you care about
-  if (event.type === 'checkout.session.completed') {
-    try {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 100 });
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-      const payload = {
-        type: event.type,
-        session_id: session.id,
-        payment_status: session.payment_status,
-        amount_total: session.amount_total,
-        currency: session.currency,
-        created: session.created,
-        customer_email: session.customer_details?.email,
-        customer_name: session.customer_details?.name,
-        metadata: session.metadata,
-        line_items: lineItems.data.map((li) => ({
-          description: li.description,
-          quantity: li.quantity,
-          amount_subtotal: li.amount_subtotal,
-          amount_total: li.amount_total,
-          price_id: li.price?.id ?? null,
-          product_id: li.price?.product ?? null,
-        })),
-      };
+    const full = await stripe.checkout.sessions.retrieve(session.id, {
+      expand: ["line_items.data.price.product"],
+    });
 
-      // Forward to n8n with the exact header your Webhook node expects
-      await fetch(process.env.N8N_WEBHOOK_URL!, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-shared-secret': process.env.N8N_SHARED_SECRET!, // must match your n8n credential
-        },
-        body: JSON.stringify(payload),
-      });
-    } catch (e) {
-      console.error('Forward to n8n failed:', e);
-      // still return 200 so Stripe doesn’t retry forever
+    const lineItems =
+      full.line_items?.data.map((li: Stripe.LineItem) => {
+        const price = li.price;
+        const product =
+          typeof price?.product === "string"
+            ? undefined
+            : (price?.product as Stripe.Product | undefined);
+
+        return {
+          quantity: li.quantity ?? 1,
+          priceId: price?.id ?? null,
+          productId:
+            typeof price?.product === "string"
+              ? price?.product
+              : product?.id ?? null,
+          productName: product?.name ?? null,
+        };
+      }) ?? [];
+
+
+    const payload = {
+      sessionId: full.id,
+      paymentStatus: full.payment_status,
+      amountTotal: full.amount_total,
+      currency: full.currency,
+      customerDetails: full.customer_details,
+      metadata: full.metadata,
+      lineItems,
+      created: full.created,
+      mode: full.mode,
+    };
+
+    const res = await fetch(process.env.N8N_WEBHOOK_URL!, {
+      method: "POST",
+      headers: {
+        'content-type': 'application/json',
+        'x-shared-secret': process.env.N8N_SHARED_SECRET!,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "n8n failed");
+      console.error("n8n forward failed:", msg);
+      return new NextResponse("received with n8n error", { status: 200 });
     }
   }
 
-  return NextResponse.json({ received: true });
+  return new NextResponse("ok", { status: 200 });
 }
