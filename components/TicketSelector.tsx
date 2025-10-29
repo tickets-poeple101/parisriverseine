@@ -206,7 +206,15 @@ export default function TicketSelector({
 
   function handleCheckout() {
     if (!canCheckout) return;
-    onCheckout?.({ date, items: picks, totalCents });
+    onCheckout?.({
+      date,
+      items: picks.map((it) => ({
+        sku: it.sku.replace(/-/g, "_"), // normalize "MOUCHES-ADULT" -> "MOUCHES_ADULT"
+        quantity: it.qty,              // also rename qty -> quantity (your route expects .quantity)
+      })),
+      totalCents,
+    });
+
   }
 
   const activeProduct = activeIdx == null ? null : products[activeIdx];
