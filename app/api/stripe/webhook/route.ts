@@ -2,12 +2,14 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const stripe = getStripe();
+// ✅ Create Stripe instance directly (don’t use getStripe)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-07-30.basil",
+});
 
 export async function POST(req: Request) {
   const hdrs = headers();
@@ -15,7 +17,7 @@ export async function POST(req: Request) {
   const whsec = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!sig || !whsec) {
-    console.error("Missing Stripe signature or secret.");
+    console.error("❌ Missing Stripe signature or secret.");
     return NextResponse.json(
       { error: "Missing signature/secret" },
       { status: 400 }
@@ -31,7 +33,7 @@ export async function POST(req: Request) {
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Unknown signature error";
-    console.error("Stripe signature verification failed:", message);
+    console.error("❌ Stripe signature verification failed:", message);
     return new NextResponse(`Webhook Error: ${message}`, { status: 400 });
   }
 
@@ -102,11 +104,11 @@ export async function POST(req: Request) {
         console.log("✅ n8n forward successful:", n8nResponse.status);
       }
     } catch (e: any) {
-      console.error("Webhook processing error:", e?.message || e);
-      // Return 200 to Stripe so it doesn’t keep retrying
+      console.error("⚠️ Webhook processing error:", e?.message || e);
+      // Always return 200 so Stripe doesn’t retry indefinitely
     }
   } else {
-    console.log("Unhandled Stripe event type:", event.type);
+    console.log("ℹ️ Unhandled Stripe event type:", event.type);
   }
 
   // Always return 200 so Stripe stops retrying
