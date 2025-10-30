@@ -1,4 +1,3 @@
-// app/api/stripe/webhook/route.ts
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -6,10 +5,10 @@ import Stripe from "stripe";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// ✅ Create Stripe instance directly (don’t use getStripe)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-07-30.basil",
 });
+
 
 export async function POST(req: Request) {
   const hdrs = headers();
