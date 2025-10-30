@@ -264,135 +264,134 @@ export default function TicketSelector({
 
           <div className="grid gap-3">
 
-            {products.map((p, idx) => {
-              const isOpen = openIds.has(p.id);
-              return (
-                <article
-                  key={p.id}
-                  role="button"
-                  tabIndex={0}
-                  aria-expanded={isOpen}
-                  className={`relative rounded-2xl border bg-white p-4 transition hover:shadow-sm hover:ring-1 hover:ring-indigo-100 cursor-pointer group ${isOpen ? "border-indigo-300 bg-[#fbfdff]" : "border-[var(--line)]"
-                    }`}
-                  onClick={(e) => {
-                    const el = e.target as HTMLElement;
-                    if (el.closest(".qty-row")) return;
-                    setActiveIdx(idx); // keep left pane in sync
-                    setOpenIds((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(p.id)) next.delete(p.id);
-                      else next.add(p.id);
-                      return next;
-                    });
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setActiveIdx(idx);
-                      setOpenIds((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(p.id)) next.delete(p.id);
-                        else next.add(p.id);
-                        return next;
-                      });
-                    }
-                  }}
-                >
+           {products.map((p, idx) => {
+  const isOpen = openIds.has(p.id);
+  return (
+    <article
+      key={p.id}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isOpen}
+      className={`relative rounded-2xl border bg-white p-4 transition hover:shadow-sm hover:ring-1 hover:ring-indigo-100 cursor-pointer group ${
+        isOpen ? "border-indigo-300 bg-[#fbfdff]" : "border-[var(--line)]"
+      }`}
+      onClick={(e) => {
+        const el = e.target as HTMLElement;
+        if (el.closest(".qty-row")) return; // don't toggle when clicking qty buttons/inputs
+        setActiveIdx(idx); // sync left pane
+        setOpenIds((prev) => {
+          const next = new Set(prev);
+          if (next.has(p.id)) next.delete(p.id);
+          else next.add(p.id);
+          return next;
+        });
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setActiveIdx(idx);
+          setOpenIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(p.id)) next.delete(p.id);
+            else next.add(p.id);
+            return next;
+          });
+        }
+      }}
+    >
+      {/* optional corner ribbon */}
+      {/eiffel/i.test(p.title) && (
+        <span className="pointer-events-none absolute -right-[1px] -bottom-[1px] z-10 inline-flex items-center gap-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[12px] font-black text-slate-700 shadow-sm">
+          ★ Most popular
+        </span>
+      )}
 
+      <h4 className="mb-2 text-[16px] font-extrabold text-[var(--ink)]">{p.title}</h4>
 
+      {activeIdx !== idx && (
+        <div className="mt-1 flex items-center gap-2 text-[13px] text-slate-600">
+          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-[2px] text-[11px] font-bold text-indigo-700">
+            Select tickets
+          </span>
+          <span className="opacity-80">
+            <span className="inline md:hidden">Tap</span>
+            <span className="hidden md:inline">Click</span> to view options
+          </span>
+          <span className="ml-auto text-[18px] text-slate-400 transition-transform group-hover:translate-x-0.5">›</span>
+        </div>
+      )}
 
-                  {/eiffel/i.test(p.title) && (
-                    <span className="pointer-events-none absolute -right-[1px] -bottom-[1px] z-10 inline-flex items-center gap-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[12px] font-black text-slate-700 shadow-sm">
-                      ★ Most popular
-                    </span>
-                  )}
-
-                  <h4 className="mb-2 text-[16px] font-extrabold text-[var(--ink)]">{p.title}</h4>
-                  {activeIdx !== idx && (
-                    <div className="mt-1 flex items-center gap-2 text-[13px] text-slate-600">
-                      <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-[2px] text-[11px] font-bold text-indigo-700">
-                        Select tickets
-                      </span>
-                      <span className="opacity-80">
-                        <span className="inline md:hidden">Tap</span>
-                        <span className="hidden md:inline">Click</span>
-                        {" "}to view options
-                      </span>
-                      <span className="ml-auto text-[18px] text-slate-400 transition-transform group-hover:translate-x-0.5">›</span>
-                    </div>
-                  )}
-
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-out ${openIds.has(p.id)
-                        ? "max-h-[700px] opacity-100 translate-y-0 mt-2"
-                        : "max-h-0 opacity-0 -translate-y-1"
-                      }`}
-                    aria-hidden={openIds.has(p.id) ? "false" : "true"}
-
-                  >
-                    <div className="grid gap-2">
-                      {p.variants.map((v) => {
-                        const k = keyFor(p.id, v.label);
-                        const q = qty[k] || 0;
-                        return (
-                          <div
-                            key={k}
-                            className={`var-row rounded-lg grid grid-cols-[1fr_auto_auto] items-center gap-2 border p-3 ${q > 0 ? "border-indigo-200 bg-[#f7fbff]" : "border-[var(--line)] bg-white"
-                              }`}
-                          >
-                            <div className="flex flex-col">
-                              <div className="text-[13px] font-extrabold text-slate-700">{v.label}</div>
-                              <div className="flex items-baseline gap-2">
-                                <span className="text-[14px] font-black text-emerald-600">{money(v.priceCents)}</span>
-                                {v.compareAtCents && v.compareAtCents > v.priceCents && (
-                                  <>
-                                    <span className="text-[12px] text-slate-400 line-through">
-                                      {money(v.compareAtCents)}
-                                    </span>
-                                    <span className="ml-1 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-[11px] font-black text-amber-700">
-                                      Save {savedPercent(v.priceCents, v.compareAtCents)}%
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="text-[12px] text-slate-500">Qty</div>
-                            <div className="qty-row flex items-center gap-2">
-                              <button
-                                type="button"
-                                aria-label="Decrease"
-                                onClick={() => bump(p.id, v.label, -1)}
-                                className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
-                              >
-                                −
-                              </button>
-                              <input
-                                type="number"
-                                min={0}
-                                max={10}
-                                value={q}
-                                onChange={(e) => setQtyDirect(p.id, v.label, Number(e.target.value))}
-                                className="h-8 w-14 rounded-md border text-center font-extrabold"
-                              />
-                              <button
-                                type="button"
-                                aria-label="Increase"
-                                onClick={() => bump(p.id, v.label, 1)}
-                                className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-out ${
+          isOpen ? "max-h-[700px] opacity-100 translate-y-0 mt-2" : "max-h-0 opacity-0 -translate-y-1"
+        }`}
+        aria-hidden={isOpen ? "false" : "true"}
+      >
+        <div className="grid gap-2">
+          {p.variants.map((v) => {
+            const k = keyFor(p.id, v.label);
+            const q = qty[k] || 0;
+            return (
+              <div
+                key={k}
+                className={`var-row rounded-lg grid grid-cols-[1fr_auto_auto] items-center gap-2 border p-3 ${
+                  q > 0 ? "border-indigo-200 bg-[#f7fbff]" : "border-[var(--line)] bg-white"
+                }`}
+              >
+                <div className="flex flex-col">
+                  <div className="text-[13px] font-extrabold text-slate-700">{v.label}</div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[14px] font-black text-emerald-600">{money(v.priceCents)}</span>
+                    {v.compareAtCents && v.compareAtCents > v.priceCents && (
+                      <>
+                        <span className="text-[12px] text-slate-400 line-through">
+                          {money(v.compareAtCents)}
+                        </span>
+                        <span className="ml-1 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-[11px] font-black text-amber-700">
+                          Save {savedPercent(v.priceCents, v.compareAtCents)}%
+                        </span>
+                      </>
+                    )}
                   </div>
+                </div>
+
+                <div className="text-[12px] text-slate-500">Qty</div>
+                <div className="qty-row flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Decrease"
+                    onClick={() => bump(p.id, v.label, -1)}
+                    className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    max={10}
+                    value={q}
+                    onChange={(e) => setQtyDirect(p.id, v.label, Number(e.target.value))}
+                    className="h-8 w-14 rounded-md border text-center font-extrabold"
+                  />
+                  <button
+                    type="button"
+                    aria-label="Increase"
+                    onClick={() => bump(p.id, v.label, 1)}
+                    className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </article>
+  );
+})}
 
 
-                </article>
-              ))}
           </div>
 
           {/* Date selector (required) */}
