@@ -111,6 +111,8 @@ export default function TicketSelector({
   const [activeIdx, setActiveIdx] = useState<number | null>(null); // keep this just for the left pane focus
   const [date, setDate] = useState<string>(""); // yyyy-mm-dd
   const [soldToday, setSoldToday] = useState<number>(ticketsSoldToday);
+  const [loading, setLoading] = useState(false);
+
 
   // Map of variantKey -> qty; key = `${product.id}:${variant.label}`
   const [qty, setQty] = useState<Record<string, number>>({});
@@ -211,18 +213,45 @@ export default function TicketSelector({
   }
 
 
-  function handleCheckout() {
-    if (!canCheckout) return;
-    onCheckout?.({
+  async function handleCheckout() {
+    if (!canCheckout || loading) return;
+
+    const payload = {
       date,
       items: picks.map((it) => ({
-        sku: it.sku.replace(/-/g, "_"), // normalize "MOUCHES-ADULT" -> "MOUCHES_ADULT"
-        quantity: it.qty,              // also rename qty -> quantity (your route expects .quantity)
+        // normalize + harden against random casing
+        sku: it.sku.replace(/-/g, "_").toUpperCase(),
+        quantity: it.qty,
       })),
       totalCents,
-    });
+    };
 
+    // If a parent handler exists, use it. Otherwise, post directly to your API.
+    if (onCheckout) {
+      onCheckout(payload);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || "Failed to start checkout");
+      }
+      window.location.href = data.url; // always new session (server handles it)
+    } catch (err: any) {
+      alert(`Checkout failed: ${err?.message || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
   }
+
 
   const activeProduct = activeIdx == null ? null : products[activeIdx];
 
@@ -264,132 +293,129 @@ export default function TicketSelector({
 
           <div className="grid gap-3">
 
-           {products.map((p, idx) => {
-  const isOpen = openIds.has(p.id);
-  return (
-    <article
-      key={p.id}
-      role="button"
-      tabIndex={0}
-      aria-expanded={isOpen}
-      className={`relative rounded-2xl border bg-white p-4 transition hover:shadow-sm hover:ring-1 hover:ring-indigo-100 cursor-pointer group ${
-        isOpen ? "border-indigo-300 bg-[#fbfdff]" : "border-[var(--line)]"
-      }`}
-      onClick={(e) => {
-        const el = e.target as HTMLElement;
-        if (el.closest(".qty-row")) return; // don't toggle when clicking qty buttons/inputs
-        setActiveIdx(idx); // sync left pane
-        setOpenIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(p.id)) next.delete(p.id);
-          else next.add(p.id);
-          return next;
-        });
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setActiveIdx(idx);
-          setOpenIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(p.id)) next.delete(p.id);
-            else next.add(p.id);
-            return next;
-          });
-        }
-      }}
-    >
-      {/* optional corner ribbon */}
-      {/eiffel/i.test(p.title) && (
-        <span className="pointer-events-none absolute -right-[1px] -bottom-[1px] z-10 inline-flex items-center gap-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[12px] font-black text-slate-700 shadow-sm">
-          ★ Most popular
-        </span>
-      )}
+            {products.map((p, idx) => {
+              const isOpen = openIds.has(p.id);
+              return (
+                <article
+                  key={p.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                  className={`relative rounded-2xl border bg-white p-4 transition hover:shadow-sm hover:ring-1 hover:ring-indigo-100 cursor-pointer group ${isOpen ? "border-indigo-300 bg-[#fbfdff]" : "border-[var(--line)]"
+                    }`}
+                  onClick={(e) => {
+                    const el = e.target as HTMLElement;
+                    if (el.closest(".qty-row")) return; // don't toggle when clicking qty buttons/inputs
+                    setActiveIdx(idx); // sync left pane
+                    setOpenIds((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(p.id)) next.delete(p.id);
+                      else next.add(p.id);
+                      return next;
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActiveIdx(idx);
+                      setOpenIds((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(p.id)) next.delete(p.id);
+                        else next.add(p.id);
+                        return next;
+                      });
+                    }
+                  }}
+                >
+                  {/* optional corner ribbon */}
+                  {/eiffel/i.test(p.title) && (
+                    <span className="pointer-events-none absolute -right-[1px] -bottom-[1px] z-10 inline-flex items-center gap-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-[12px] font-black text-slate-700 shadow-sm">
+                      ★ Most popular
+                    </span>
+                  )}
 
-      <h4 className="mb-2 text-[16px] font-extrabold text-[var(--ink)]">{p.title}</h4>
+                  <h4 className="mb-2 text-[16px] font-extrabold text-[var(--ink)]">{p.title}</h4>
 
-      {activeIdx !== idx && (
-        <div className="mt-1 flex items-center gap-2 text-[13px] text-slate-600">
-          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-[2px] text-[11px] font-bold text-indigo-700">
-            Select tickets
-          </span>
-          <span className="opacity-80">
-            <span className="inline md:hidden">Tap</span>
-            <span className="hidden md:inline">Click</span> to view options
-          </span>
-          <span className="ml-auto text-[18px] text-slate-400 transition-transform group-hover:translate-x-0.5">›</span>
-        </div>
-      )}
+                  {activeIdx !== idx && (
+                    <div className="mt-1 flex items-center gap-2 text-[13px] text-slate-600">
+                      <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-[2px] text-[11px] font-bold text-indigo-700">
+                        Select tickets
+                      </span>
+                      <span className="opacity-80">
+                        <span className="inline md:hidden">Tap</span>
+                        <span className="hidden md:inline">Click</span> to view options
+                      </span>
+                      <span className="ml-auto text-[18px] text-slate-400 transition-transform group-hover:translate-x-0.5">›</span>
+                    </div>
+                  )}
 
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? "max-h-[700px] opacity-100 translate-y-0 mt-2" : "max-h-0 opacity-0 -translate-y-1"
-        }`}
-        aria-hidden={isOpen ? "false" : "true"}
-      >
-        <div className="grid gap-2">
-          {p.variants.map((v) => {
-            const k = keyFor(p.id, v.label);
-            const q = qty[k] || 0;
-            return (
-              <div
-                key={k}
-                className={`var-row rounded-lg grid grid-cols-[1fr_auto_auto] items-center gap-2 border p-3 ${
-                  q > 0 ? "border-indigo-200 bg-[#f7fbff]" : "border-[var(--line)] bg-white"
-                }`}
-              >
-                <div className="flex flex-col">
-                  <div className="text-[13px] font-extrabold text-slate-700">{v.label}</div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[14px] font-black text-emerald-600">{money(v.priceCents)}</span>
-                    {v.compareAtCents && v.compareAtCents > v.priceCents && (
-                      <>
-                        <span className="text-[12px] text-slate-400 line-through">
-                          {money(v.compareAtCents)}
-                        </span>
-                        <span className="ml-1 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-[11px] font-black text-amber-700">
-                          Save {savedPercent(v.priceCents, v.compareAtCents)}%
-                        </span>
-                      </>
-                    )}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? "max-h-[700px] opacity-100 translate-y-0 mt-2" : "max-h-0 opacity-0 -translate-y-1"
+                      }`}
+                    aria-hidden={isOpen ? "false" : "true"}
+                  >
+                    <div className="grid gap-2">
+                      {p.variants.map((v) => {
+                        const k = keyFor(p.id, v.label);
+                        const q = qty[k] || 0;
+                        return (
+                          <div
+                            key={k}
+                            className={`var-row rounded-lg grid grid-cols-[1fr_auto_auto] items-center gap-2 border p-3 ${q > 0 ? "border-indigo-200 bg-[#f7fbff]" : "border-[var(--line)] bg-white"
+                              }`}
+                          >
+                            <div className="flex flex-col">
+                              <div className="text-[13px] font-extrabold text-slate-700">{v.label}</div>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-[14px] font-black text-emerald-600">{money(v.priceCents)}</span>
+                                {v.compareAtCents && v.compareAtCents > v.priceCents && (
+                                  <>
+                                    <span className="text-[12px] text-slate-400 line-through">
+                                      {money(v.compareAtCents)}
+                                    </span>
+                                    <span className="ml-1 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-[11px] font-black text-amber-700">
+                                      Save {savedPercent(v.priceCents, v.compareAtCents)}%
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="text-[12px] text-slate-500">Qty</div>
+                            <div className="qty-row flex items-center gap-2">
+                              <button
+                                type="button"
+                                aria-label="Decrease"
+                                onClick={() => bump(p.id, v.label, -1)}
+                                className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
+                              >
+                                −
+                              </button>
+                              <input
+                                type="number"
+                                min={0}
+                                max={10}
+                                value={q}
+                                onChange={(e) => setQtyDirect(p.id, v.label, Number(e.target.value))}
+                                className="h-8 w-14 rounded-md border text-center font-extrabold"
+                              />
+                              <button
+                                type="button"
+                                aria-label="Increase"
+                                onClick={() => bump(p.id, v.label, 1)}
+                                className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-
-                <div className="text-[12px] text-slate-500">Qty</div>
-                <div className="qty-row flex items-center gap-2">
-                  <button
-                    type="button"
-                    aria-label="Decrease"
-                    onClick={() => bump(p.id, v.label, -1)}
-                    className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min={0}
-                    max={10}
-                    value={q}
-                    onChange={(e) => setQtyDirect(p.id, v.label, Number(e.target.value))}
-                    className="h-8 w-14 rounded-md border text-center font-extrabold"
-                  />
-                  <button
-                    type="button"
-                    aria-label="Increase"
-                    onClick={() => bump(p.id, v.label, 1)}
-                    className="h-8 w-8 rounded-md border bg-slate-50 font-black text-slate-700 hover:bg-indigo-50"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </article>
-  );
-})}
+                </article>
+              );
+            })}
 
 
           </div>
@@ -420,13 +446,18 @@ export default function TicketSelector({
           </div>
           <button
             type="button"
-            disabled={!canCheckout}
+            disabled={!canCheckout || loading}
             onClick={handleCheckout}
-            className={`mt-2 w-full rounded-xl px-4 py-3 text-[15px] font-black text-white shadow-sm ${canCheckout ? "bg-[var(--accent)] hover:brightness-105" : "bg-slate-300"
+            className={`mt-2 w-full rounded-xl px-4 py-3 text-[15px] font-black text-white shadow-sm ${canCheckout && !loading ? "bg-[var(--accent)] hover:brightness-105" : "bg-slate-300"
               }`}
           >
-            {canCheckout ? `Book ${qtyCount(picks)} ticket${qtyCount(picks) > 1 ? "s" : ""} now` : addToCartText}
+            {loading
+              ? "Processing..."
+              : (canCheckout
+                ? `Book ${qtyCount(picks)} ticket${qtyCount(picks) > 1 ? "s" : ""} now`
+                : addToCartText)}
           </button>
+
 
           {/* Mini-cart */}
           <div className="mt-3 rounded-xl border border-[var(--line)] bg-[#fafbff] p-3 shadow-sm">
@@ -486,13 +517,14 @@ export default function TicketSelector({
                 </div>
                 <button
                   type="button"
-                  disabled={!canCheckout}
+                  disabled={!canCheckout || loading}
                   onClick={handleCheckout}
-                  className={`rounded-lg px-3 py-2 text-sm font-black ${canCheckout ? "bg-[var(--accent)]" : "bg-slate-600"
+                  className={`rounded-lg px-3 py-2 text-sm font-black ${canCheckout && !loading ? "bg-[var(--accent)]" : "bg-slate-600"
                     }`}
                 >
-                  {canCheckout ? `Pay ${money(totalCents)}` : "Select a date"}
+                  {loading ? "Processing..." : (canCheckout ? `Pay ${money(totalCents)}` : "Select a date")}
                 </button>
+
               </div>
             )}
           </div>
