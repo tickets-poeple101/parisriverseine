@@ -18,12 +18,16 @@
     "startPoint": "Port de la Bourdonnais (Eiffel Tower), Pontoon #3",
     "audioLanguages": ["English","French","Spanish","German","Italian","Portuguese","Dutch","Polish","Russian","Chinese","Japanese","Korean","Arabic","Hindi"],
     "seasonalDepartures": "Roughly every 30–45 min, from late morning into the evening (times vary by season).",
-    "startPointLatLng": { "lat": 48.861, "lng": 2.297 },
+    "startPointLatLng": { "lat": 48.8609, "lng": 2.2945 },
     "itineraryStops": [
-      { "title": "Boarding at Pontoon #3", "time": "10:00", "note": "Show e-ticket at the gate" },
-      { "title": "Pass the Musée d'Orsay", "time": "10:20", "note": "Audio guide highlights" },
-      { "title": "Notre-Dame views", "time": "10:35", "note": "Great photo moment" },
-      { "title": "Return to Pontoon #3", "time": "11:00", "note": "Disembark" }
+      { "title": "Boarding at Bateaux Parisiens", "time": "10:00 - 22:00", "note": "Show E-ticket at the gate" },
+      { "title": "Eiffel Tower", "note": "Great photo moment" },
+      { "title": "Musee d'Orsay", "note": "Audio Guide highlight" },
+      { "title": "Cathedrale Notre-Dame de Paris", "note": "Great View" },
+      { "title": "Ile de la Cite" },
+      { "title": "Pont Neuf", "note": "Audio Guide highlight" },
+      { "title": "Louvre Museum", "note": "Good View of Famous Landmark" },
+      { "title": "Disembark at Bateaux Parisiens", "note": "Return to original location for exit" }
     ]
   },
   {
@@ -45,13 +49,21 @@
     "startPoint": "Port de la Conférence (near Pont de l’Alma), 75008 Paris",
     "audioLanguages": ["English","French"],
     "seasonalDepartures": "About every 30 min (Apr–Sep) and ~every 45 min (Oct–Mar), typically 10:00–22:30.",
-    "startPointLatLng": { "lat": 48.8637, "lng": 2.3005 },
+    "startPointLatLng": { "lat": 48.86411, "lng": 2.30643 },
     "itineraryStops": [
-      { "title": "Boarding at Port de la Conférence", "time": "10:00", "note": "Scan ticket at the pontoon" },
-      { "title": "Pont Alexandre III", "time": "10:15", "note": "Iconic bridge views" },
-      { "title": "Musée d’Orsay stretch", "time": "10:30", "note": "Glass lounge vantage points" },
-      { "title": "Turn near Île de la Cité", "time": "10:45", "note": "Notre-Dame panorama" },
-      { "title": "Return to Port de la Conférence", "time": "11:10", "note": "Disembark" }
+      { "title": "Boarding at Port de la Conférence", "time": "10:00 - 22:00", "note": "Scan E-ticket at the pontoon" },
+      { "title": "Place de la Concorde", "note": "Iconic views" },
+      { "title": "Louvre Museum", "note": "Outside Views" },
+      { "title": "Hotel de Ville" },
+      { "title": "Conciergerie" },
+      { "title": "Ile de la Cite", "note": "Audio Guide Highlight" },
+      { "title": "Cathedrale Notre-Dame de Paris", "note": "Notre-Dame panorama" },
+      { "title": "Pont Neuf"},
+      { "title": "Musee d'Orsay", "note": "Gorgeous Picture Location" },
+      { "title": "Esplanade des Invalides" },
+      { "title": "Eiffel Tower", "note": "Highlight for Most" },
+      { "title": "Palais de Chaillot" },
+      { "title": "Return at Port de la Conférence", "note": "Same Location as Departure" },
     ]
   },
   {
@@ -73,13 +85,19 @@
     "startPoint": "Cruise at Port de la Bourdonnais (Eiffel Tower), Pontoon #3; bus from any Big Bus stop",
     "audioLanguages": ["Multilingual audio on bus; cruise audio via partner"],
     "seasonalDepartures": "Cruise roughly every 45 min; bus every ~10–20 min.",
-    "startPointLatLng": { "lat": 48.861, "lng": 2.297 },
+    "startPointLatLng": { "lat": 48.8669, "lng": 2.3340 },
     "itineraryStops": [
-      { "title": "Start: Any Big Bus stop", "time": "09:30", "note": "Scan pass and ride to Eiffel Tower" },
-      { "title": "Arrive: Eiffel Tower stop", "time": "10:15", "note": "Walk to Port de la Bourdonnais" },
-      { "title": "Cruise boarding at Pontoon #3", "time": "10:30", "note": "Show cruise ticket" },
-      { "title": "Louvre riverfront", "time": "10:50", "note": "Open-top deck views" },
-      { "title": "Return to Pontoon #3", "time": "11:30", "note": "Continue bus route if desired" }
+      { "title": "Start: Any Big Bus stop", "time": "09:45 - 17:30", "note": "Scan E-Ticket" },
+      { "title": "Recommended Route Below"},
+      { "title": "#1: Louvre-Pyramide", "time": "9:45", "note": "Good Starting Point" },
+      { "title": "Stop #4/5: Louvre–Pont des Arts", "time": "10:00", "note": "Open-top deck views" },
+      { "title": "Continue to Stop #6: Notre Dame – 3 Rue Lagrange", "time": "10:45"},
+      { "title": "Stop #8: Trocadéro / Avenue Paul Doumer for the classic Eiffel Tower view.", "time": "11:15" },
+      { "title": "Champs-Élysées (Stop #9)", "time": "12:00", "note": "Arc de Triomphe" },
+      { "title": "Stop #7: Musée d’Orsay", "time": "13:00", "note": "58 Place Henry de Montherlant" },
+      { "title": "Stop #4", "time": "15:00", "note": "Final sights: maybe a stroll through the Tuileries / Place Vendôme." },
+      { "title": "Board Your Cruise", "time": "17:00" }
+
     ]
   }
 ]
