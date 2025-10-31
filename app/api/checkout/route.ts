@@ -12,15 +12,15 @@ const PRICE_MAP: Record<string, string> = {
   PARISIENS_CHILD: "price_1SFuTDBq3JaiOlPJrLzArpUb",
   MOUCHES_ADULT: "price_1SFuTmBq3JaiOlPJNYtSb4I3",
   MOUCHES_CHILD: "price_1SFuTyBq3JaiOlPJy4lutU4K",
-  BIGBUSCOMBO_ADULT: "price_1SFuUZBq3JaiOlPJjrdeFNVL",
+  BIGBUSCOMBO_ADULT: "price_1SFuSsBq3JaiOlPJhMq7H9YM",
   BIGBUSCOMBO_CHILD: "price_1SFuV4Bq3JaiOlPJtSPjwSO9",
 };
 
-type Item = { sku: string; quantity: number };
+type Item = { sku: string; quantity: number; date?: string };
 type Body = {
   items: Item[];
-  date?: string;
-  customerEmail?: string; // optional
+  date?: string;            // optional session-level date
+  customerEmail?: string;   // optional
 };
 
 export async function POST(req: Request) {
@@ -36,19 +36,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "items[] required" }, { status: 400 });
   }
 
-  // ---------- Merge duplicates + clamp quantities ----------
-  const merged: Record<string, number> = {};
-  for (const it of body.items) {
-    if (!it || typeof it.sku !== "string") continue;
-    const priceId = PRICE_MAP[it.sku];
-    if (!priceId) continue; // ignore unknown SKU (anti-tamper)
-    const qty = Number.isFinite(it.quantity)
-      ? Math.max(1, Math.min(50, Math.floor(it.quantity)))
-      : 1;
-    merged[priceId] = (merged[priceId] ?? 0) + qty;
+  // ---------- Normalize + merge duplicates + clamp quantities ----------
+  // Key by PRICE_ID (not SKU) so duplicates merge even if SKUs repeat.
+  const mergedByPrice: Record<string, number> = {};
+  for (const raw of body.items) {
+    if (!raw || typeof raw.sku !== "string") continue;
+
+    // Be tolerant: uppercase, swap hyphens for underscores, trim
+    const normSku = raw.sku.toUpperCase().replace(/-/g, "_").trim();
+    const priceId = PRICE_MAP[normSku];
+    if (!priceId) {
+      // ignore unknown SKU (anti-tamper / stale UI)
+      continue;
+    }
+
+    const q = Number.isFinite(raw.quantity) ? Math.floor(raw.quantity as number) : 1;
+    const qty = Math.max(1, Math.min(50, q)); // clamp 1..50
+
+    mergedByPrice[priceId] = (mergedByPrice[priceId] ?? 0) + qty;
   }
 
-  const line_items = Object.entries(merged).map(([price, quantity]) => ({
+  const line_items = Object.entries(mergedByPrice).map(([price, quantity]) => ({
     price,
     quantity,
     // adjustable_quantity: { enabled: false }, // enable if you want fixed qty in Checkout
@@ -64,26 +72,37 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "NEXT_PUBLIC_BASE_URL not set" }, { status: 500 });
   }
 
-  // ---------- Stripe ----------
+  // ---------- Prepare metadata (compact + complete) ----------
+  // We persist *per-item* dates if provided; otherwise fall back to body.date
+  const itemsForMeta = body.items.map((it) => ({
+    sku: it.sku.toUpperCase().replace(/-/g, "_").trim(),
+    quantity: Number.isFinite(it.quantity) ? Math.floor(it.quantity as number) : 1,
+    date: it.date ?? body.date ?? null,
+  }));
+
   const stripe = getStripe();
 
   try {
-    // IMPORTANT: No idempotency key here → always a new session.
+    // IMPORTANT: No idempotency key → always a new session.
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
       success_url: `${base}/success?sid={CHECKOUT_SESSION_ID}`,
       cancel_url: `${base}/?canceled=1`,
       customer_email: body.customerEmail || undefined,
-      metadata: { source: "homepage", ...(body.date ? { date: body.date } : {}) },
+      metadata: {
+        source: "homepage",
+        ...(body.date ? { date: body.date } : {}),
+        items_json: JSON.stringify(itemsForMeta),
+      },
     });
 
     const res = NextResponse.json({ url: session.url }, { status: 200 });
-    res.headers.set("Cache-Control", "no-store, max-age=0"); // don’t cache this response
+    res.headers.set("Cache-Control", "no-store, max-age=0");
     return res;
   } catch (err: unknown) {
     const msg =
-      typeof err === "object" && err && "message" in err
+      typeof err === "object" && err && "message" in (err as any)
         ? String((err as { message?: string }).message)
         : "Stripe error";
     console.error("checkout error:", err);
