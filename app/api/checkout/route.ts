@@ -12,7 +12,7 @@ const PRICE_MAP: Record<string, string> = {
   PARISIENS_CHILD: "price_1SFuTDBq3JaiOlPJrLzArpUb",
   MOUCHES_ADULT: "price_1SFuTmBq3JaiOlPJNYtSb4I3",
   MOUCHES_CHILD: "price_1SFuTyBq3JaiOlPJy4lutU4K",
-  BIGBUSCOMBO_ADULT: "price_1SFuSsBq3JaiOlPJhMq7H9YM",
+  BIGBUSCOMBO_ADULT: "price_1SFuUZBq3JaiOlPJjrdeFNVL",
   BIGBUSCOMBO_CHILD: "price_1SFuV4Bq3JaiOlPJtSPjwSO9",
 };
 
@@ -50,8 +50,10 @@ export async function POST(req: Request) {
       continue;
     }
 
-    const q = Number.isFinite(raw.quantity) ? Math.floor(raw.quantity as number) : 1;
-    const qty = Math.max(1, Math.min(50, q)); // clamp 1..50
+    const qtyRaw =
+      typeof raw.quantity === "number" ? raw.quantity : parseInt(String(raw.quantity), 10);
+    const qty = Number.isFinite(qtyRaw) ? Math.max(1, Math.min(50, Math.floor(qtyRaw))) : 1;
+
 
     mergedByPrice[priceId] = (mergedByPrice[priceId] ?? 0) + qty;
   }
@@ -76,7 +78,11 @@ export async function POST(req: Request) {
   // We persist *per-item* dates if provided; otherwise fall back to body.date
   const itemsForMeta = body.items.map((it) => ({
     sku: it.sku.toUpperCase().replace(/-/g, "_").trim(),
-    quantity: Number.isFinite(it.quantity) ? Math.floor(it.quantity as number) : 1,
+    quantity:
+      Number.isFinite(typeof it.quantity === "number" ? it.quantity : parseInt(String(it.quantity), 10))
+        ? Math.floor(typeof it.quantity === "number" ? it.quantity : parseInt(String(it.quantity), 10))
+        : 1,
+
     date: it.date ?? body.date ?? null,
   }));
 
