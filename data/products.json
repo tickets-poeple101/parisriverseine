@@ -21,13 +21,13 @@
     "startPointLatLng": { "lat": 48.8609, "lng": 2.2945 },
     "itineraryStops": [
       { "title": "Boarding at Bateaux Parisiens", "time": "10:00 - 22:00", "note": "Show E-ticket at the gate" },
-      { "title": "Eiffel Tower", "note": "Great photo moment" },
-      { "title": "Musee d'Orsay", "note": "Audio Guide highlight" },
-      { "title": "Cathedrale Notre-Dame de Paris", "note": "Great View" },
-      { "title": "Ile de la Cite" },
-      { "title": "Pont Neuf", "note": "Audio Guide highlight" },
-      { "title": "Louvre Museum", "note": "Good View of Famous Landmark" },
-      { "title": "Disembark at Bateaux Parisiens", "note": "Return to original location for exit" }
+      { "title": "Eiffel Tower", "time": "", "note": "Great photo moment" },
+      { "title": "Musee d'Orsay", "time": "", "note": "Audio Guide highlight" },
+      { "title": "Cathedrale Notre-Dame de Paris", "time": "", "note": "Great View" },
+      { "title": "Ile de la Cite", "time": "", "note": "" },
+      { "title": "Pont Neuf", "time": "", "note": "Audio Guide highlight" },
+      { "title": "Louvre Museum", "time": "", "note": "Good View of Famous Landmark" },
+      { "title": "Disembark at Bateaux Parisiens", "time": "", "note": "Return to original location for exit" }
     ]
   },
   {
@@ -37,7 +37,7 @@
     "images": ["/images/mouches-1.jpg"],
     "variants": [
       { "label": "Adult", "priceCents": 1499, "compareAtCents": 2132, "sku": "MOUCHES-ADULT" },
-      { "label": "Child", "priceCents": 799,  "compareAtCents": 1212, "sku": "MOUCHES-CHILD" }
+      { "label": "Child", "priceCents": 799, "compareAtCents": 1212, "sku": "MOUCHES-CHILD" }
     ],
     "features": [
       "Departs near Pont de l’Alma (Port de la Conférence, 75008)",
@@ -52,18 +52,18 @@
     "startPointLatLng": { "lat": 48.86411, "lng": 2.30643 },
     "itineraryStops": [
       { "title": "Boarding at Port de la Conférence", "time": "10:00 - 22:00", "note": "Scan E-ticket at the pontoon" },
-      { "title": "Place de la Concorde", "note": "Iconic views" },
-      { "title": "Louvre Museum", "note": "Outside Views" },
-      { "title": "Hotel de Ville" },
-      { "title": "Conciergerie" },
-      { "title": "Ile de la Cite", "note": "Audio Guide Highlight" },
-      { "title": "Cathedrale Notre-Dame de Paris", "note": "Notre-Dame panorama" },
-      { "title": "Pont Neuf"},
-      { "title": "Musee d'Orsay", "note": "Gorgeous Picture Location" },
-      { "title": "Esplanade des Invalides" },
-      { "title": "Eiffel Tower", "note": "Highlight for Most" },
-      { "title": "Palais de Chaillot" },
-      { "title": "Return at Port de la Conférence", "note": "Same Location as Departure" },
+      { "title": "Place de la Concorde", "time": "", "note": "Iconic views" },
+      { "title": "Louvre Museum", "time": "", "note": "Outside Views" },
+      { "title": "Hotel de Ville", "time": "", "note": "" },
+      { "title": "Conciergerie", "time": "", "note": "" },
+      { "title": "Ile de la Cite", "time": "", "note": "Audio Guide Highlight" },
+      { "title": "Cathedrale Notre-Dame de Paris", "time": "", "note": "Notre-Dame panorama" },
+      { "title": "Pont Neuf", "time": "", "note": "" },
+      { "title": "Musee d'Orsay", "time": "", "note": "Gorgeous Picture Location" },
+      { "title": "Esplanade des Invalides", "time": "", "note": "" },
+      { "title": "Eiffel Tower", "time": "", "note": "Highlight for Most" },
+      { "title": "Palais de Chaillot", "time": "", "note": "" },
+      { "title": "Return at Port de la Conférence", "time": "", "note": "Same Location as Departure" }
     ]
   },
   {
@@ -88,16 +88,15 @@
     "startPointLatLng": { "lat": 48.8669, "lng": 2.3340 },
     "itineraryStops": [
       { "title": "Start: Any Big Bus stop", "time": "09:45 - 17:30", "note": "Scan E-Ticket" },
-      { "title": "Recommended Route Below"},
-      { "title": "#1: Louvre-Pyramide", "time": "9:45", "note": "Good Starting Point" },
+      { "title": "Recommended Route Below", "time": "", "note": "" },
+      { "title": "#1: Louvre-Pyramide", "time": "09:45", "note": "Good Starting Point" },
       { "title": "Stop #4/5: Louvre–Pont des Arts", "time": "10:00", "note": "Open-top deck views" },
-      { "title": "Continue to Stop #6: Notre Dame – 3 Rue Lagrange", "time": "10:45"},
-      { "title": "Stop #8: Trocadéro / Avenue Paul Doumer for the classic Eiffel Tower view.", "time": "11:15" },
+      { "title": "Continue to Stop #6: Notre Dame – 3 Rue Lagrange", "time": "10:45", "note": "" },
+      { "title": "Stop #8: Trocadéro / Avenue Paul Doumer for the classic Eiffel Tower view.", "time": "11:15", "note": "" },
       { "title": "Champs-Élysées (Stop #9)", "time": "12:00", "note": "Arc de Triomphe" },
       { "title": "Stop #7: Musée d’Orsay", "time": "13:00", "note": "58 Place Henry de Montherlant" },
       { "title": "Stop #4", "time": "15:00", "note": "Final sights: maybe a stroll through the Tuileries / Place Vendôme." },
-      { "title": "Board Your Cruise", "time": "17:00" }
-
+      { "title": "Board Your Cruise", "time": "17:00", "note": "" }
     ]
   }
 ]
